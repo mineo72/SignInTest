@@ -41,7 +41,8 @@ namespace WinFormsApp16
                 rdr.Close();
                 MySqlCommand insComm = new($"INSERT INTO user(userName, userPass) VALUES('{textBox1.Text}', '{textBox2.Text}')",conn);
                 insComm.ExecuteNonQuery();
-                MessageBox.Show("Signed Up!");
+                Form2 form = new Form2();
+                form.ShowDialog();
                 conn.Close();
             }
         }
@@ -51,12 +52,27 @@ namespace WinFormsApp16
             string connStr = "server=localhost;user=root;database=dotnet;port=3306;password=Got22259";
             MySqlConnection conn = new(connStr);
             conn.Open();
-            string takenCheck = $"SELECT userName FROM user WHERE userName = '{textBox1.Text}' AND userPass ='{textBox2.Text}'";
+            string takenCheck = $"SELECT userId FROM user WHERE userName = '{textBox1.Text}' AND userPass ='{textBox2.Text}'";
             MySqlCommand cmd = new(takenCheck, conn);
             MySqlDataReader rdr = cmd.ExecuteReader();
+            
             if (rdr.HasRows)
             {
+                rdr.Read();
+                int id = rdr.GetInt32(0);
                 MessageBox.Show("Logged in");
+                rdr.Close();
+                takenCheck = $"SELECT * FROM info WHERE infoUserId = '{id}'";
+                cmd = new(takenCheck, conn);
+                rdr = cmd.ExecuteReader();
+                if (rdr.Read())
+                {
+                    string? name = rdr.GetString(1);
+                string? place = rdr.GetString(2);
+                MessageBox.Show($"Hello {name} from {place}");
+                rdr.Close();
+                }
+                
             }
             else
             {
